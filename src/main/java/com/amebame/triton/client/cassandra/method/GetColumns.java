@@ -100,6 +100,10 @@ public class GetColumns {
 		return columns != null;
 	}
 	
+	public boolean hasSingleColumn() {
+		return columns != null && !columns.isArray() && !columns.isObject();
+	}
+	
 	public boolean hasColumnRange() {
 		return columns != null && columns.isObject();
 	}
