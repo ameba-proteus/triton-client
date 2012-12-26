@@ -2,9 +2,14 @@ package com.amebame.triton.client.cassandra.method;
 
 import java.util.Map;
 
+import com.amebame.triton.client.TritonMethodData;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 
+@JsonInclude(Include.NON_NULL)
+@TritonMethodData("cassandra.column.set")
 public class SetColumns {
 	
 	private Map<String, Map<String, JsonNode>> rows;

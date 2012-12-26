@@ -24,12 +24,16 @@ public class CreateColumnFamily {
 	
 	private String comment;
 	
+	@JsonProperty("compaction_strategy")
 	private String compactionStrategy;
 	
+	@JsonProperty("compaction_strategy_options")
 	private Map<String, String> compactionStrategyOptions;
 	
+	@JsonProperty("compression_options")
 	private Map<String, String> compressionOptions;
 	
+	@JsonProperty("default_validation_class")
 	private String defaultValidationClass = "BytesType";
 	
 	@JsonProperty("dclocal_read_repair_chance")

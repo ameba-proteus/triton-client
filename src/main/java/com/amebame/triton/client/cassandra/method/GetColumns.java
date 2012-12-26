@@ -1,11 +1,13 @@
 package com.amebame.triton.client.cassandra.method;
 
+import com.amebame.triton.client.TritonMethodData;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 
+@TritonMethodData("cassandra.column.get")
 @JsonInclude(Include.NON_NULL)
 public class GetColumns {
 	
