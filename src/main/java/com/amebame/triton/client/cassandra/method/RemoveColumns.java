@@ -3,10 +3,12 @@ package com.amebame.triton.client.cassandra.method;
 import java.util.List;
 import java.util.Map;
 
+import com.amebame.triton.client.TritonMethodData;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+@TritonMethodData("cassandra.column.remove")
 @JsonInclude(Include.NON_NULL)
 public class RemoveColumns {
 	
