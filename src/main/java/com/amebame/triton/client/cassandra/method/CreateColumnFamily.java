@@ -20,7 +20,7 @@ public class CreateColumnFamily {
 	
 	private String caching;
 	
-	private String comparator = "BytesType";
+	private String comparator;
 	
 	private String comment;
 	
@@ -34,7 +34,7 @@ public class CreateColumnFamily {
 	private Map<String, String> compressionOptions;
 	
 	@JsonProperty("default_validation_class")
-	private String defaultValidationClass = "BytesType";
+	private String defaultValidationClass;
 	
 	@JsonProperty("dclocal_read_repair_chance")
 	private Double dclocalReadRepairChance;
@@ -43,7 +43,7 @@ public class CreateColumnFamily {
 	private Integer GcGraceSeconds;
 	
 	@JsonProperty("key_validation_class")
-	private String keyValidationClass = "BytesType";
+	private String keyValidationClass;
 	
 	public CreateColumnFamily() {
 	}
