@@ -18,14 +18,23 @@ public class TritonCall {
 	private TritonBody body;
 
 	public TritonCall(String name, Object data) {
-		this.callId = counter.incrementAndGet();
-		if (this.callId > MAX_CALL_ID) {
-			counter.compareAndSet(callId, 0);
+		this(name, data, false);
+	}
+	
+	public TritonCall(String name, Object data, boolean noReply) {
+		if (noReply) {
+			this.callId = 0;
+		} else {
+			this.callId = counter.incrementAndGet();
+			if (this.callId > MAX_CALL_ID) {
+				counter.compareAndSet(callId, 0);
+			}
 		}
 		
 		JsonNode node = Json.tree(data);
 		this.body = new TritonBody(name, node);
 	}
+	
 	
 	public int getCallId() {
 		return callId;

@@ -130,7 +130,7 @@ public class TritonClient {
 	 */
 	public void sendAsyncFully(String name, Object data) throws TritonClientException {
 		checkOpen();
-		TritonCall call = new TritonCall(name, data);
+		TritonCall call = new TritonCall(name, data, true);
 		write(call);
 	}
 	
