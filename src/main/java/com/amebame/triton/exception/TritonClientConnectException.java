@@ -12,7 +12,7 @@ public class TritonClientConnectException extends TritonClientException {
 	}
 
 	public TritonClientConnectException(Throwable cause) {
-		super(cause);
+		super(cause.getMessage(), cause);
 	}
 
 	public TritonClientConnectException(String message, Throwable cause) {

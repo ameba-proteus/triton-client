@@ -25,7 +25,7 @@ public class TritonRuntimeException extends RuntimeException {
 	}
 
 	public TritonRuntimeException(Throwable cause) {
-		super(cause);
+		super(cause.getMessage(), cause);
 	}
 
 }

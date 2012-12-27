@@ -12,7 +12,7 @@ public class TritonClientException extends TritonException {
 	}
 
 	public TritonClientException(Throwable cause) {
-		super(cause);
+		super(cause.getMessage(), cause);
 	}
 
 	public TritonClientException(String message, Throwable cause) {

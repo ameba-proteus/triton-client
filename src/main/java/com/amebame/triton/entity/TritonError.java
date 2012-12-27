@@ -4,10 +4,6 @@ public class TritonError {
 	
 	private String message;
 	
-	public TritonError(Throwable e) {
-		this.message = e.getMessage();
-	}
-	
 	public TritonError(String message) {
 		this.message = message;
 	}

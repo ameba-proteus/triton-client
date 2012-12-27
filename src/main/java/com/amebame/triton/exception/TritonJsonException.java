@@ -22,7 +22,7 @@ public class TritonJsonException extends TritonRuntimeException {
 	}
 
 	public TritonJsonException(Throwable cause) {
-		super(cause);
+		super(cause.getMessage(), cause);
 	}
 
 }
