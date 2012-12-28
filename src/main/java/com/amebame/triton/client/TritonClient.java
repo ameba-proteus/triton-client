@@ -8,11 +8,10 @@ import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFactory;
 import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.ChannelPipeline;
-import org.jboss.netty.channel.socket.nio.NioClientBossPool;
 import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
-import org.jboss.netty.channel.socket.nio.NioWorkerPool;
-import org.jboss.netty.util.HashedWheelTimer;
+import org.jboss.netty.channel.socket.nio.NioSocketChannelConfig;
 import org.jboss.netty.util.ThreadNameDeterminer;
+import org.jboss.netty.util.ThreadRenamingRunnable;
 
 import com.amebame.triton.entity.TritonCall;
 import com.amebame.triton.entity.TritonFuture;
@@ -57,17 +56,26 @@ public class TritonClient {
 	 */
 	public TritonClient(TritonClientConfiguration config) {
 		context = new TritonClientContext(config);
+		ThreadRenamingRunnable.setThreadNameDeterminer(DETERMINER);
+		/*
 		NioClientBossPool bossPool = new NioClientBossPool(
 				Executors.newCachedThreadPool(new NamedThreadFactory("triton-client-boss-")),
-				config.getBoss(),
+				2,
 				new HashedWheelTimer(),
 				DETERMINER
 		);
 		NioWorkerPool workerPool = new NioWorkerPool(
 				Executors.newCachedThreadPool(new NamedThreadFactory("triton-client-worker-")),
-				config.getWorker(),
+				10,
 				DETERMINER);
-		channelFactory = new NioClientSocketChannelFactory(bossPool, workerPool);
+		
+		NioClientSocketChannelFactory channelFactory = new NioClientSocketChannelFactory(bossPool, workerPool);
+		*/
+		NioClientSocketChannelFactory channelFactory = new NioClientSocketChannelFactory(
+				Executors.newFixedThreadPool(config.getBoss(), new NamedThreadFactory("triton-client-boss-")),
+				Executors.newFixedThreadPool(config.getWorker(), new NamedThreadFactory("triton-client-worker-"))
+		);
+		this.channelFactory = channelFactory;
 		try {
 			pipeline = new TritonClientPipelineFactory(context).getPipeline();
 		} catch (Exception e) {
@@ -92,6 +100,9 @@ public class TritonClient {
 	 */
 	public void open(String host, int port) throws TritonClientConnectException {
 		channel = channelFactory.newChannel(pipeline);
+		NioSocketChannelConfig config = (NioSocketChannelConfig) channel.getConfig();
+		config.setTcpNoDelay(true);
+		
 		try {
 			ChannelFuture future = channel.connect(new InetSocketAddress(host, port));
 			if (!future.await(context.getConfig().getConnectTimeout())) {
