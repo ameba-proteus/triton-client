@@ -24,21 +24,4 @@ public class TritonException extends Exception {
 		super(message, cause, enableSuppression, writableStackTrace);
 	}
 	
-	/**
-	 * Get root cause of {@link Throwable} instance.
-	 * @param throwable
-	 * @return
-	 */
-	public static final Throwable getRootCause(Throwable throwable) {
-		int max = 10;
-		while (max-- > 0) {
-			Throwable cause = throwable.getCause();
-			if (cause == null || cause == throwable) {
-				break;
-			}
-			throwable = cause;
-		}
-		return throwable;
-	}
-
 }
