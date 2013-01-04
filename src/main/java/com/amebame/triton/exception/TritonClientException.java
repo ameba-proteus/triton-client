@@ -4,24 +4,17 @@ public class TritonClientException extends TritonException {
 	
 	private static final long serialVersionUID = 8716954986231799899L;
 
-	public TritonClientException() {
+	public TritonClientException(TritonErrors error, String message) {
+		super(error, message);
 	}
 
-	public TritonClientException(String message) {
-		super(message);
+	public TritonClientException(TritonErrors error, Throwable cause) {
+		super(error, cause.getMessage(), cause);
 	}
 
-	public TritonClientException(Throwable cause) {
-		super(cause.getMessage(), cause);
+	public TritonClientException(TritonErrors error, String message, Throwable cause) {
+		super(error, message, cause);
 	}
 
-	public TritonClientException(String message, Throwable cause) {
-		super(message, cause);
-	}
-
-	public TritonClientException(String message, Throwable cause,
-			boolean enableSuppression, boolean writableStackTrace) {
-		super(message, cause, enableSuppression, writableStackTrace);
-	}
 
 }

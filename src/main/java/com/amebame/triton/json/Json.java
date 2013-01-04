@@ -13,6 +13,7 @@ import org.jboss.netty.buffer.ChannelBufferInputStream;
 
 import com.amebame.triton.exception.TritonJsonException;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -36,6 +37,8 @@ public class Json {
 		// set feature
 		// write date as ISO8601 string
 		mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+		// ignore unknown properties
+		mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 		// set serializer/deserializer
 		SimpleModule module = new SimpleModule("triton-json");
 		// UUID serializer/deserializer

@@ -4,24 +4,24 @@ public class TritonException extends Exception {
 
 	private static final long serialVersionUID = 6884306643710263861L;
 
-	public TritonException() {
-	}
+	private TritonErrors error;
 
-	public TritonException(String message) {
+	public TritonException(TritonErrors error, String message) {
 		super(message);
+		this.error = error;
 	}
 
-	public TritonException(Throwable cause) {
+	public TritonException(TritonErrors error, Throwable cause) {
 		super(cause.getMessage(), cause);
+		this.error = error;
 	}
 
-	public TritonException(String message, Throwable cause) {
+	public TritonException(TritonErrors error, String message, Throwable cause) {
 		super(message, cause);
-	}
-
-	public TritonException(String message, Throwable cause,
-			boolean enableSuppression, boolean writableStackTrace) {
-		super(message, cause, enableSuppression, writableStackTrace);
+		this.error = error;
 	}
 	
+	public TritonErrors getError() {
+		return error;
+	}
 }

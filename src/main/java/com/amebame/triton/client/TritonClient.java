@@ -19,6 +19,7 @@ import com.amebame.triton.exception.TritonClientClosedException;
 import com.amebame.triton.exception.TritonClientConnectException;
 import com.amebame.triton.exception.TritonClientException;
 import com.amebame.triton.exception.TritonClientTimeoutException;
+import com.amebame.triton.exception.TritonErrors;
 import com.amebame.triton.exception.TritonRuntimeException;
 import com.amebame.triton.json.Json;
 import com.amebame.triton.protocol.TritonMessage;
@@ -79,7 +80,7 @@ public class TritonClient {
 		try {
 			pipeline = new TritonClientPipelineFactory(context).getPipeline();
 		} catch (Exception e) {
-			throw new TritonRuntimeException(e.getMessage(), e);
+			throw new TritonRuntimeException(TritonErrors.client_error, e.getMessage(), e);
 		}
 	}
 	
@@ -182,7 +183,7 @@ public class TritonClient {
 	public TritonFuture sendAsync(Object data) throws TritonClientException {
 		TritonMethodData methodData = data.getClass().getAnnotation(TritonMethodData.class);
 		if (methodData == null) {
-			throw new TritonRuntimeException("method data must annotated with TritonMethodData");
+			throw new TritonRuntimeException(TritonErrors.client_error, "method data must annotated with TritonMethodData");
 		}
 		return sendAsync(methodData.value(), data);
 	}
@@ -195,7 +196,7 @@ public class TritonClient {
 	public JsonNode send(Object data) throws TritonClientException {
 		TritonMethodData methodData = data.getClass().getAnnotation(TritonMethodData.class);
 		if (methodData == null) {
-			throw new TritonRuntimeException("method data must annotated with TritonMethodData");
+			throw new TritonRuntimeException(TritonErrors.client_error, "method data must annotated with TritonMethodData");
 		}
 		return send(methodData.value(), data);
 	}
@@ -208,7 +209,7 @@ public class TritonClient {
 	public <E> E send(Object data, Class<E> resultClass) throws TritonClientException {
 		TritonMethodData methodData = data.getClass().getAnnotation(TritonMethodData.class);
 		if (methodData == null) {
-			throw new TritonRuntimeException("method data must annotated with TritonMethodData");
+			throw new TritonRuntimeException(TritonErrors.client_error, "method data must annotated with TritonMethodData");
 		}
 		JsonNode result = send(methodData.value(), data);
 		return Json.convert(result, resultClass);
@@ -229,11 +230,14 @@ public class TritonClient {
 		}
 		if (message.isError()) {
 			if (message.hasBody()) {
-				JsonNode messageNode = message.getBodyJson().get("message");
+				JsonNode body = message.getBodyJson();
+				JsonNode messageNode = body.get("message");
 				String errorMessage = messageNode == null ? "" : messageNode.asText();
-				throw new TritonClientException(errorMessage);
+				JsonNode codeNode = body.get("code");
+				int errorCode = codeNode == null ? 500 : codeNode.asInt();
+				throw new TritonClientException(TritonErrors.codeOf(errorCode), errorMessage);
 			} else {
-				throw new TritonClientException("unknown exception caused at server");
+				throw new TritonClientException(TritonErrors.server_error, "unknown exception caused at server");
 			}
 		}
 		return message.getBodyJson();
