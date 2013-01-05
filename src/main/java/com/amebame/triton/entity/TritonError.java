@@ -7,6 +7,7 @@ public class TritonError {
 	private String message;
 	
 	public TritonError(int code, String message) {
+		this.code = code;
 		this.message = message;
 	}
 	
