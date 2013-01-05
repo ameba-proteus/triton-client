@@ -69,7 +69,7 @@ public class GetColumns {
 	
 	@JsonIgnore
 	public boolean isSingleKey() {
-		return keys != null && !keys.isArray();
+		return keys != null && !keys.isArray() && !keys.isObject();
 	}
 	
 	public boolean hasKeys() {
