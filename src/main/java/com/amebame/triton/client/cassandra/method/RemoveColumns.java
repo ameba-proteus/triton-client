@@ -52,6 +52,10 @@ public class RemoveColumns {
 	public void setColumnFamily(String columnFamily) {
 		this.columnFamily = columnFamily;
 	}
+	
+	public boolean hasRows() {
+		return rows != null && rows.size() > 0;
+	}
 
 	public Map<String, List<String>> getRows() {
 		return rows;
@@ -67,6 +71,10 @@ public class RemoveColumns {
 
 	public void setConsistency(Consistency consistency) {
 		this.consistency = consistency;
+	}
+	
+	public boolean hasKeys() {
+		return keys != null && keys.size() > 0;
 	}
 	
 	public List<String> getKeys() {
