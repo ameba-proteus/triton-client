@@ -1,5 +1,6 @@
 package com.amebame.triton.client.cassandra.method;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +19,8 @@ public class RemoveColumns {
 	
 	@JsonProperty("column_family")
 	private String columnFamily;
+	
+	private List<String> keys;
 	
 	private Map<String, List<String>> rows;
 	
@@ -64,6 +67,18 @@ public class RemoveColumns {
 
 	public void setConsistency(Consistency consistency) {
 		this.consistency = consistency;
+	}
+	
+	public List<String> getKeys() {
+		return keys;
+	}
+	
+	public void setKeys(List<String> keys) {
+		this.keys = keys;
+	}
+	
+	public void setKey(String key) {
+		this.keys = Arrays.asList(key);
 	}
 
 }
