@@ -7,7 +7,7 @@ public class LockAcquire {
 	
 	private String key;
 	
-	private int timeout = 60000;
+	private int timeout = 10000;
 
 	public LockAcquire() {
 	}
