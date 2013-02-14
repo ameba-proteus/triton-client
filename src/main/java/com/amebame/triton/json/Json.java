@@ -19,6 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.BooleanNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.NumericNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -212,7 +213,7 @@ public class Json {
 	public static final NumericNode number(long value) {
 		return JsonNodeFactory.instance.numberNode(value);
 	}
-
+	
 	/**
 	 * Create a numeric node
 	 * @param value
@@ -249,5 +250,14 @@ public class Json {
 		return JsonNodeFactory.instance.numberNode(value);
 	}
 	
+	/**
+	 * Create a boolean node
+	 * @param bool
+	 * @return
+	 */
+	public static final BooleanNode bool(boolean bool) {
+		return JsonNodeFactory.instance.booleanNode(bool);
+	}
+
 }
 
