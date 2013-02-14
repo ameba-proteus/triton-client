@@ -19,6 +19,7 @@ public class TritonCassandraKeyspace {
 	@JsonProperty("strategy_options")
 	private Map<String, String> strategyOptions;
 	
+	@JsonProperty("column_families")
 	private List<TritonCassandraColumnFamily> columnFamilies;
 
 	public TritonCassandraKeyspace() {
