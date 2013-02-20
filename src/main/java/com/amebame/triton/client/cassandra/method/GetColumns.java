@@ -1,6 +1,7 @@
 package com.amebame.triton.client.cassandra.method;
 
 import com.amebame.triton.client.TritonMethodData;
+import com.amebame.triton.json.Json;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -110,6 +111,10 @@ public class GetColumns {
 	
 	public boolean hasColumnNames() {
 		return columns != null && columns.isArray();
+	}
+	
+	public void setColumn(JsonNode column) {
+		this.columns = Json.array().add(column);
 	}
 	
 	public void setColumns(JsonNode columns) {
