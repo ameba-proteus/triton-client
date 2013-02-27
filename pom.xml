@@ -11,9 +11,8 @@
 	<url>http://maven.apache.org</url>
 
 	<properties>
-		<client.version>0.1.0-SNAPSHOT</client.version>
-		<netty.version>3.6.2.Final</netty.version>
-		<jackson.version>2.1.3</jackson.version>
+		<netty.version>3.6.3.Final</netty.version>
+		<jackson.version>2.1.4</jackson.version>
 		<junit.version>4.11</junit.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
