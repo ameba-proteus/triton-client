@@ -26,8 +26,11 @@ public class GetColumns {
 	 * "a" = single key
 	 * ["a","b","c"] = key array
 	 * { "start": "starttoken", "end": "endtoken" }
-	 * { "start": {"value":"starttoken","exclusive": true }, "end": "tokey" } = column range with start exclusive
-	 * { "start": "start", "limit": 100, "reversed": true }
+	 * { "start": {"value":"starttoken","exclusive": true }, "end": "endtoken" } = column range with start exclusive
+	 * { "start": "starttoken", "limit": 100, "reversed": true, "end": "endtoken" }
+	 * 
+	 * note that the key is sorted by what partitioner you use.
+	 * if start is specified, end must be also specified.
 	 */
 	private JsonNode keys;
 	
@@ -36,6 +39,7 @@ public class GetColumns {
 	 * "a" = single column
 	 * ["a","b","c"] = column array
 	 * { "start": "fromkey", "end": "tokey" } = column range
+	 * { "startWith": "prefix" } = column start with prefix. if start or end is specified, startWith will be ignored.
 	 * { "start": {"value": "fromkey", "exclusive": true}, "end": "tokey" } = column range with start exclusive
 	 * { "end": "endcolumn", "limit": 100, "reversed": true } = column range with limit and reversed order.
 	 */
