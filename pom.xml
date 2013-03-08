@@ -16,6 +16,12 @@
 		<junit.version>4.11</junit.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
+
+	<scm>
+		<connection>scm:git:git://github.com/ameba-proteus/triton-client.git</connection>
+		<url>scm:git:git://github.com/ameba-proteus/triton-client.git</url>
+		<developerConnection>scm:git:git://github.com/ameba-proteus/triton-client.git</developerConnection>
+	</scm>
 	
 	<build>
 		<pluginManagement>
