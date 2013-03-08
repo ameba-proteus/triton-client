@@ -1,10 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.amebame.triton</groupId>
 	<artifactId>triton-client</artifactId>
-	<version>0.1.0-SNAPSHOT</version>
+	<version>0.1.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>triton-client</name>
@@ -18,9 +17,8 @@
 	</properties>
 
 	<scm>
-		<connection>scm:git:git://github.com/ameba-proteus/triton-client.git</connection>
-		<url>scm:git:git://github.com/ameba-proteus/triton-client.git</url>
-		<developerConnection>scm:git:git://github.com/ameba-proteus/triton-client.git</developerConnection>
+		<url>http://github.com/ameba-proteus/triton-client.git</url>
+		<connection>scm:git:https://github.com/ameba-proteus/triton-client.git</connection>
 	</scm>
 	
 	<build>
