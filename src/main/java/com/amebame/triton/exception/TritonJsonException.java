@@ -5,24 +5,19 @@ public class TritonJsonException extends TritonRuntimeException {
 	private static final long serialVersionUID = -5916693574413964335L;
 
 	public TritonJsonException() {
-		super();
-	}
-
-	public TritonJsonException(String message, Throwable cause,
-			boolean enableSuppression, boolean writableStackTrace) {
-		super(message, cause, enableSuppression, writableStackTrace);
+		super(TritonErrors.json_format);
 	}
 
 	public TritonJsonException(String message, Throwable cause) {
-		super(message, cause);
+		super(TritonErrors.json_format, message, cause);
 	}
 
 	public TritonJsonException(String message) {
-		super(message);
+		super(TritonErrors.json_format, message);
 	}
 
 	public TritonJsonException(Throwable cause) {
-		super(cause.getMessage(), cause);
+		super(TritonErrors.json_format, cause.getMessage(), cause);
 	}
 
 }

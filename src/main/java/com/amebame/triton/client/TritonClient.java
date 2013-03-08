@@ -8,11 +8,10 @@ import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFactory;
 import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.ChannelPipeline;
-import org.jboss.netty.channel.socket.nio.NioClientBossPool;
 import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
-import org.jboss.netty.channel.socket.nio.NioWorkerPool;
-import org.jboss.netty.util.HashedWheelTimer;
+import org.jboss.netty.channel.socket.nio.NioSocketChannelConfig;
 import org.jboss.netty.util.ThreadNameDeterminer;
+import org.jboss.netty.util.ThreadRenamingRunnable;
 
 import com.amebame.triton.entity.TritonCall;
 import com.amebame.triton.entity.TritonFuture;
@@ -20,6 +19,7 @@ import com.amebame.triton.exception.TritonClientClosedException;
 import com.amebame.triton.exception.TritonClientConnectException;
 import com.amebame.triton.exception.TritonClientException;
 import com.amebame.triton.exception.TritonClientTimeoutException;
+import com.amebame.triton.exception.TritonErrors;
 import com.amebame.triton.exception.TritonRuntimeException;
 import com.amebame.triton.json.Json;
 import com.amebame.triton.protocol.TritonMessage;
@@ -57,21 +57,30 @@ public class TritonClient {
 	 */
 	public TritonClient(TritonClientConfiguration config) {
 		context = new TritonClientContext(config);
+		ThreadRenamingRunnable.setThreadNameDeterminer(DETERMINER);
+		/*
 		NioClientBossPool bossPool = new NioClientBossPool(
 				Executors.newCachedThreadPool(new NamedThreadFactory("triton-client-boss-")),
-				config.getBoss(),
+				2,
 				new HashedWheelTimer(),
 				DETERMINER
 		);
 		NioWorkerPool workerPool = new NioWorkerPool(
 				Executors.newCachedThreadPool(new NamedThreadFactory("triton-client-worker-")),
-				config.getWorker(),
+				10,
 				DETERMINER);
-		channelFactory = new NioClientSocketChannelFactory(bossPool, workerPool);
+		
+		NioClientSocketChannelFactory channelFactory = new NioClientSocketChannelFactory(bossPool, workerPool);
+		*/
+		NioClientSocketChannelFactory channelFactory = new NioClientSocketChannelFactory(
+				Executors.newFixedThreadPool(config.getBoss(), new NamedThreadFactory("triton-client-boss-")),
+				Executors.newFixedThreadPool(config.getWorker(), new NamedThreadFactory("triton-client-worker-"))
+		);
+		this.channelFactory = channelFactory;
 		try {
 			pipeline = new TritonClientPipelineFactory(context).getPipeline();
 		} catch (Exception e) {
-			throw new TritonRuntimeException(e.getMessage(), e);
+			throw new TritonRuntimeException(TritonErrors.client_error, e.getMessage(), e);
 		}
 	}
 	
@@ -92,6 +101,9 @@ public class TritonClient {
 	 */
 	public void open(String host, int port) throws TritonClientConnectException {
 		channel = channelFactory.newChannel(pipeline);
+		NioSocketChannelConfig config = (NioSocketChannelConfig) channel.getConfig();
+		config.setTcpNoDelay(true);
+		
 		try {
 			ChannelFuture future = channel.connect(new InetSocketAddress(host, port));
 			if (!future.await(context.getConfig().getConnectTimeout())) {
@@ -171,7 +183,7 @@ public class TritonClient {
 	public TritonFuture sendAsync(Object data) throws TritonClientException {
 		TritonMethodData methodData = data.getClass().getAnnotation(TritonMethodData.class);
 		if (methodData == null) {
-			throw new TritonRuntimeException("method data must annotated with TritonMethodData");
+			throw new TritonRuntimeException(TritonErrors.client_error, "method data must annotated with TritonMethodData");
 		}
 		return sendAsync(methodData.value(), data);
 	}
@@ -184,7 +196,7 @@ public class TritonClient {
 	public JsonNode send(Object data) throws TritonClientException {
 		TritonMethodData methodData = data.getClass().getAnnotation(TritonMethodData.class);
 		if (methodData == null) {
-			throw new TritonRuntimeException("method data must annotated with TritonMethodData");
+			throw new TritonRuntimeException(TritonErrors.client_error, "method data must annotated with TritonMethodData");
 		}
 		return send(methodData.value(), data);
 	}
@@ -197,7 +209,7 @@ public class TritonClient {
 	public <E> E send(Object data, Class<E> resultClass) throws TritonClientException {
 		TritonMethodData methodData = data.getClass().getAnnotation(TritonMethodData.class);
 		if (methodData == null) {
-			throw new TritonRuntimeException("method data must annotated with TritonMethodData");
+			throw new TritonRuntimeException(TritonErrors.client_error, "method data must annotated with TritonMethodData");
 		}
 		JsonNode result = send(methodData.value(), data);
 		return Json.convert(result, resultClass);
@@ -218,11 +230,14 @@ public class TritonClient {
 		}
 		if (message.isError()) {
 			if (message.hasBody()) {
-				JsonNode messageNode = message.getBodyJson().get("message");
+				JsonNode body = message.getBodyJson();
+				JsonNode messageNode = body.get("message");
 				String errorMessage = messageNode == null ? "" : messageNode.asText();
-				throw new TritonClientException(errorMessage);
+				JsonNode codeNode = body.get("code");
+				int errorCode = codeNode == null ? 500 : codeNode.asInt();
+				throw new TritonClientException(TritonErrors.codeOf(errorCode), errorMessage);
 			} else {
-				throw new TritonClientException("unknown exception caused at server");
+				throw new TritonClientException(TritonErrors.server_error, "unknown exception caused at server");
 			}
 		}
 		return message.getBodyJson();

@@ -6,26 +6,35 @@ public class TritonRuntimeException extends RuntimeException {
 	 * 
 	 */
 	private static final long serialVersionUID = 7958464770082357800L;
+	
+	private TritonErrors error;
 
 	public TritonRuntimeException() {
 		super();
+		this.error = TritonErrors.server_error;
 	}
 
-	public TritonRuntimeException(String message, Throwable cause,
-			boolean enableSuppression, boolean writableStackTrace) {
-		super(message, cause, enableSuppression, writableStackTrace);
+	public TritonRuntimeException(TritonErrors error) {
+		super();
+		this.error = error;
 	}
 
-	public TritonRuntimeException(String message, Throwable cause) {
+	public TritonRuntimeException(TritonErrors error, String message, Throwable cause) {
 		super(message, cause);
+		this.error = error;
 	}
-
-	public TritonRuntimeException(String message) {
+	
+	public TritonRuntimeException(TritonErrors error, String message) {
 		super(message);
+		this.error = error;
 	}
 
-	public TritonRuntimeException(Throwable cause) {
+	public TritonRuntimeException(TritonErrors error, Throwable cause) {
 		super(cause.getMessage(), cause);
+		this.error = error;
 	}
 
+	public TritonErrors getError() {
+		return error;
+	}
 }
