@@ -4,12 +4,10 @@ import java.net.InetSocketAddress;
 import java.nio.channels.NotYetConnectedException;
 import java.util.concurrent.Executors;
 
+import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelFactory;
 import org.jboss.netty.channel.ChannelFuture;
-import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
-import org.jboss.netty.channel.socket.nio.NioSocketChannelConfig;
 import org.jboss.netty.util.ThreadNameDeterminer;
 import org.jboss.netty.util.ThreadRenamingRunnable;
 
@@ -29,8 +27,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 public class TritonClient {
 	
 	private TritonClientContext context;
-	private ChannelPipeline pipeline;
-	private ChannelFactory channelFactory;
+	private ClientBootstrap bootstrap;
 	private Channel channel;
 	
 	private static final JsonNode EMPTY_NODE = Json.object();
@@ -58,27 +55,15 @@ public class TritonClient {
 	public TritonClient(TritonClientConfiguration config) {
 		context = new TritonClientContext(config);
 		ThreadRenamingRunnable.setThreadNameDeterminer(DETERMINER);
-		/*
-		NioClientBossPool bossPool = new NioClientBossPool(
-				Executors.newCachedThreadPool(new NamedThreadFactory("triton-client-boss-")),
-				2,
-				new HashedWheelTimer(),
-				DETERMINER
-		);
-		NioWorkerPool workerPool = new NioWorkerPool(
-				Executors.newCachedThreadPool(new NamedThreadFactory("triton-client-worker-")),
-				10,
-				DETERMINER);
-		
-		NioClientSocketChannelFactory channelFactory = new NioClientSocketChannelFactory(bossPool, workerPool);
-		*/
 		NioClientSocketChannelFactory channelFactory = new NioClientSocketChannelFactory(
 				Executors.newFixedThreadPool(config.getBoss(), new NamedThreadFactory("triton-client-boss-")),
 				Executors.newFixedThreadPool(config.getWorker(), new NamedThreadFactory("triton-client-worker-"))
 		);
-		this.channelFactory = channelFactory;
 		try {
-			pipeline = new TritonClientPipelineFactory(context).getPipeline();
+			bootstrap = new ClientBootstrap(channelFactory);
+			bootstrap.setPipeline(new TritonClientPipelineFactory(context).getPipeline());
+			bootstrap.setOption("tcpNoDelay", true);
+			bootstrap.setOption("keepAlive", true);
 		} catch (Exception e) {
 			throw new TritonRuntimeException(TritonErrors.client_error, e.getMessage(), e);
 		}
@@ -100,15 +85,12 @@ public class TritonClient {
 	 * @throws TritonClientConnectException
 	 */
 	public void open(String host, int port) throws TritonClientConnectException {
-		channel = channelFactory.newChannel(pipeline);
-		NioSocketChannelConfig config = (NioSocketChannelConfig) channel.getConfig();
-		config.setTcpNoDelay(true);
-		
 		try {
-			ChannelFuture future = channel.connect(new InetSocketAddress(host, port));
+			ChannelFuture future = bootstrap.bind(new InetSocketAddress(host, port));
 			if (!future.await(context.getConfig().getConnectTimeout())) {
 				throw new TritonClientConnectException("failed to connect to the server");
 			}
+			channel = future.getChannel();
 		} catch (InterruptedException e) {
 		}
 	}
@@ -268,6 +250,6 @@ public class TritonClient {
 			} catch (InterruptedException e) {
 			}
 		}
-		channelFactory.shutdown();
+		bootstrap.shutdown();
 	}
 }
