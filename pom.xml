@@ -10,7 +10,7 @@
 	<url>http://maven.apache.org</url>
 
 	<properties>
-		<netty.version>3.6.3.Final</netty.version>
+		<netty.version>3.6.5.Final</netty.version>
 		<jackson.version>2.1.4</jackson.version>
 		<junit.version>4.11</junit.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
