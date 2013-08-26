@@ -1,9 +1,8 @@
 package com.amebame.triton.client;
 
 import java.util.Iterator;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import org.jboss.netty.util.internal.ConcurrentHashMap;
 
 import com.amebame.triton.entity.TritonFuture;
 

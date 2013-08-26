@@ -1,34 +1,22 @@
 package com.amebame.triton.protocol;
 
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.handler.codec.oneone.OneToOneEncoder;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.MessageToByteEncoder;
 
 /**
  * Triton Protocol Encoder
  * to encode data to TritonMesasge
  * 
  */
-public class TritonProtocolEncoder extends OneToOneEncoder {
+public class TritonProtocolEncoder extends MessageToByteEncoder<TritonMessage> {
 	
 	@Override
-	protected Object encode(
+	protected void encode(
 			ChannelHandlerContext ctx,
-			Channel channel,
-			Object object) throws Exception {
-		
-		// prevent non triton message
-		if (!(object instanceof TritonMessage)) {
-			return object;
-		}
-		TritonMessage message = (TritonMessage) object;
-		
-		// create buffer which can contain whole data
-		ChannelBuffer buffer = ChannelBuffers.buffer(message.getFrameLength());
+			TritonMessage msg,
+			ByteBuf out) throws Exception {
 		// write to message
-		message.writeTo(buffer);
-		return buffer;
+		msg.writeTo(out);
 	}
 }

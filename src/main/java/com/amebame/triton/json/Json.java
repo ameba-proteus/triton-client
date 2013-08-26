@@ -1,5 +1,8 @@
 package com.amebame.triton.json;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufInputStream;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
@@ -7,9 +10,6 @@ import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.UUID;
-
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBufferInputStream;
 
 import com.amebame.triton.exception.TritonJsonException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -87,9 +87,9 @@ public class Json {
 	 * @param buffer
 	 * @return
 	 */
-	public static final JsonNode tree(ChannelBuffer buffer) {
+	public static final JsonNode tree(ByteBuf buffer) {
 		try {
-			return MAPPER.readTree(new ChannelBufferInputStream(buffer));
+			return MAPPER.readTree(new ByteBufInputStream(buffer));
 		} catch (IOException e) {
 			throw new TritonJsonException(e.getMessage(), e);
 		}
@@ -163,9 +163,9 @@ public class Json {
 	 * @param clazz
 	 * @return
 	 */
-	public static final <E> E convert(ChannelBuffer buffer, Class<E> clazz) {
+	public static final <E> E convert(ByteBuf buffer, Class<E> clazz) {
 		try {
-			return MAPPER.readValue(new ChannelBufferInputStream(buffer), clazz);
+			return MAPPER.readValue(new ByteBufInputStream(buffer), clazz);
 		} catch (IOException e) {
 			throw new TritonJsonException(e);
 		}
