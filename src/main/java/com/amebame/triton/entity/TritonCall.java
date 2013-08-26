@@ -1,9 +1,9 @@
 package com.amebame.triton.entity;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.amebame.triton.json.Json;
 import com.amebame.triton.protocol.TritonMessage;
@@ -50,7 +50,7 @@ public class TritonCall {
 	 */
 	public TritonMessage build() {
 		byte[] jsonByte = Json.bytes(body);
-		ChannelBuffer bodyBuffer = ChannelBuffers.wrappedBuffer(jsonByte);
+		ByteBuf bodyBuffer = Unpooled.wrappedBuffer(jsonByte);
 		return new TritonMessage(
 				TritonMessage.COMMAND,
 				callId,

@@ -1,13 +1,12 @@
 package com.amebame.triton.client;
 
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 
 import com.amebame.triton.entity.TritonFuture;
 import com.amebame.triton.protocol.TritonMessage;
 
-public class TritonClientHandler extends SimpleChannelUpstreamHandler {
+public class TritonClientHandler extends ChannelInboundHandlerAdapter {
 	
 	private TritonClientContext context;
 	
@@ -16,8 +15,9 @@ public class TritonClientHandler extends SimpleChannelUpstreamHandler {
 	}
 	
 	@Override
-	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
-		TritonMessage message = (TritonMessage) e.getMessage();
+	public void channelRead(ChannelHandlerContext ctx, Object msg)
+			throws Exception {
+		TritonMessage message = (TritonMessage) msg;
 		if (message.isReply() || message.isError()) {
 			TritonFuture future = context.removeFuture(message.getCallId());
 			if (future != null) {

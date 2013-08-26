@@ -1,26 +1,28 @@
 package com.amebame.triton.protocol;
 
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.handler.codec.frame.FrameDecoder;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.ReplayingDecoder;
+
+import java.util.List;
 
 /**
  * Triton Protocol Encoder
  * to encode data to TritonMesasge
  * 
  */
-public class TritonProtocolDecoder extends FrameDecoder {
+public class TritonProtocolDecoder extends ReplayingDecoder<Void> {
+	
+	public TritonProtocolDecoder() {
+	}
 	
 	@Override
-	protected Object decode(
-			ChannelHandlerContext ctx,
-			Channel channel,
-			ChannelBuffer buffer) throws Exception {
+	protected void decode(ChannelHandlerContext ctx,
+			ByteBuf buffer, List<Object> out) throws Exception {
 		
 		// Wait header data
 		if (buffer.readableBytes() < 16) {
-			return null;
+			return;
 		}
 		
 		buffer.markReaderIndex();
@@ -37,13 +39,13 @@ public class TritonProtocolDecoder extends FrameDecoder {
 		if (buffer.readableBytes() < length) {
 			// reset position
 			buffer.resetReaderIndex();
-			return null;
+			return;
 		}
 		
 		// read body
-		ChannelBuffer body = buffer.readBytes(length);
+		ByteBuf body = buffer.readBytes(length);
 		
-		TritonMessage message = new TritonMessage(type, callId, body);
-		return message;
+		// add triton message
+		out.add(new TritonMessage(type, callId, body));
 	}
 }

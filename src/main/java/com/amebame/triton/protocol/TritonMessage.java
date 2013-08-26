@@ -1,9 +1,9 @@
 package com.amebame.triton.protocol;
 
-import java.util.Arrays;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
+import java.util.Arrays;
 
 import com.amebame.triton.json.Json;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -27,7 +27,7 @@ public class TritonMessage {
 	private short type;
 	private int callId;
 	
-	private ChannelBuffer body;
+	private ByteBuf body;
 	
 	/**
 	 * Create the triton message with custom ChannelBuffer.
@@ -35,7 +35,7 @@ public class TritonMessage {
 	 * @param callId
 	 * @param body
 	 */
-	public TritonMessage(short type, int callId, ChannelBuffer body) {
+	public TritonMessage(short type, int callId, ByteBuf body) {
 		this.type = type;
 		this.callId = callId;
 		this.body = body;
@@ -51,7 +51,8 @@ public class TritonMessage {
 	public TritonMessage(short type, int callId, Object body) {
 		this.type = type;
 		this.callId = callId;
-		this.body = ChannelBuffers.wrappedBuffer(Json.bytes(body));
+		byte[] bytes = Json.bytes(body);
+		this.body = Unpooled.wrappedBuffer(bytes);
 	}
 	
 	public boolean isCommand() {
@@ -94,7 +95,7 @@ public class TritonMessage {
 	 * Get body data
 	 * @return
 	 */
-	public ChannelBuffer getBody() {
+	public ByteBuf getBody() {
 		return body;
 	}
 	
@@ -135,11 +136,18 @@ public class TritonMessage {
 	 * Write message to {@link ChannelBuffer}
 	 * @param buffer
 	 */
-	public void writeTo(ChannelBuffer buffer) {
+	public void writeTo(ByteBuf buffer) {
 		buffer.writeShort(type);
 		buffer.writeInt(getLength());
 		buffer.writeInt(callId);
 		buffer.writeBytes(RESERVED);
 		buffer.writeBytes(body);
+	}
+	
+	/**
+	 * Release message and allocated buffer.
+	 */
+	public void release() {
+		body.release();
 	}
 }

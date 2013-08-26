@@ -1,15 +1,13 @@
 package com.amebame.triton.client;
 
-import java.net.InetSocketAddress;
-import java.nio.channels.NotYetConnectedException;
-import java.util.concurrent.Executors;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioSocketChannel;
 
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelFuture;
-import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
-import org.jboss.netty.util.ThreadNameDeterminer;
-import org.jboss.netty.util.ThreadRenamingRunnable;
+import java.nio.channels.NotYetConnectedException;
 
 import com.amebame.triton.entity.TritonCall;
 import com.amebame.triton.entity.TritonFuture;
@@ -27,19 +25,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 public class TritonClient {
 	
 	private TritonClientContext context;
-	private ClientBootstrap bootstrap;
+	private Bootstrap bootstrap;
 	private Channel channel;
+	private EventLoopGroup group;
 	
 	private static final JsonNode EMPTY_NODE = Json.object();
-	
-	private static final ThreadNameDeterminer DETERMINER = new ThreadNameDeterminer() {
-		@Override
-		public String determineThreadName(
-				String currentThreadName,
-				String proposedThreadName) throws Exception {
-			return currentThreadName;
-		}
-	};
 	
 	/**
 	 * Create triton client with default configuraiton.
@@ -53,17 +43,19 @@ public class TritonClient {
 	 * @param config
 	 */
 	public TritonClient(TritonClientConfiguration config) {
+
 		context = new TritonClientContext(config);
-		ThreadRenamingRunnable.setThreadNameDeterminer(DETERMINER);
-		NioClientSocketChannelFactory channelFactory = new NioClientSocketChannelFactory(
-				Executors.newFixedThreadPool(config.getBoss(), new NamedThreadFactory("triton-client-boss-")),
-				Executors.newFixedThreadPool(config.getWorker(), new NamedThreadFactory("triton-client-worker-"))
-		);
+		group = new NioEventLoopGroup(config.getWorker(), new NamedThreadFactory("triton-client-"));
+
 		try {
-			bootstrap = new ClientBootstrap(channelFactory);
-			bootstrap.setPipeline(new TritonClientPipelineFactory(context).getPipeline());
-			bootstrap.setOption("tcpNoDelay", true);
-			bootstrap.setOption("keepAlive", true);
+			bootstrap = new Bootstrap()
+			.group(group)
+			.channel(NioSocketChannel.class)
+			.handler(new TritonClientChannelInitializer(context))
+			.option(ChannelOption.SO_KEEPALIVE, true)
+			.option(ChannelOption.TCP_NODELAY, true)
+			.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, context.getConfig().getConnectTimeout())
+			;
 		} catch (Exception e) {
 			throw new TritonRuntimeException(TritonErrors.client_error, e.getMessage(), e);
 		}
@@ -86,11 +78,9 @@ public class TritonClient {
 	 */
 	public void open(String host, int port) throws TritonClientConnectException {
 		try {
-			ChannelFuture future = bootstrap.bind(new InetSocketAddress(host, port));
-			if (!future.await(context.getConfig().getConnectTimeout())) {
-				throw new TritonClientConnectException("failed to connect to the server");
-			}
-			channel = future.getChannel();
+			channel = bootstrap.connect(host, port)
+					.sync()
+					.channel();
 		} catch (InterruptedException e) {
 		}
 	}
@@ -100,18 +90,18 @@ public class TritonClient {
 	 * @return
 	 */
 	public boolean isOpen() {
-		return channel != null && channel.isConnected();
+		return channel != null && channel.isActive();
 	}
 	
 	private void checkOpen() throws TritonClientClosedException {
-		if (channel == null || !channel.isOpen()) {
+		if (channel == null || !channel.isActive()) {
 			throw new TritonClientClosedException();
 		}
 	}
 	
 	private void write(TritonCall call) throws TritonClientClosedException {
 		try {
-			channel.write(call.build());
+			channel.writeAndFlush(call.build());
 		} catch (NotYetConnectedException e) {
 			throw new TritonClientClosedException();
 		}
@@ -244,12 +234,12 @@ public class TritonClient {
 	 * Close the client connection
 	 */
 	public void close() {
-		if (channel != null && channel.isConnected()) {
+		if (channel != null && channel.isOpen()) {
 			try {
 				channel.close().await(5000L);
 			} catch (InterruptedException e) {
 			}
 		}
-		bootstrap.shutdown();
+		group.shutdownGracefully();
 	}
 }
