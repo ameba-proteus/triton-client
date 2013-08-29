@@ -161,7 +161,7 @@ public class TritonClient {
 	}
 	
 	/**
-	 * Send datat to the server and waiting for reply.
+	 * Send data to the server and waiting for reply.
 	 * @param data
 	 * @return
 	 */
@@ -174,7 +174,7 @@ public class TritonClient {
 	}
 	
 	/**
-	 * Send datat to the server and waiting for reply.
+	 * Send data to the server and waiting for reply.
 	 * @param data
 	 * @return
 	 */
