@@ -7,6 +7,9 @@ import java.util.Map;
  * Triton error codes
  */
 public enum TritonErrors {
+	
+	// unknown error
+	unknown(10),
 
 	// client errors
 	client_error(400),
@@ -31,11 +34,15 @@ public enum TritonErrors {
 	cassandra_invalid_comparator(681),
 	cassandra_invalid_token_type(682),
 	
-	
 	// memcached errros
 	memcached_not_cofigured(700),
 	memcached_error(710),
-	memcached_timeout(711)
+	memcached_timeout(711),
+
+	// elastic search
+	elasticsearch_error(800),
+	elasticsearch_no_cluster(810)
+	
 	;
 	
 	private int code;
@@ -51,7 +58,11 @@ public enum TritonErrors {
 	}
 	
 	public static final TritonErrors codeOf(int code) {
-		return MAP.get(code);
+		if (MAP.containsKey(code)) {
+			return MAP.get(code);
+		} else {
+			return unknown;
+		}
 	}
 	
 	private static final Map<Integer, TritonErrors> createMap() {
