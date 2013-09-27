@@ -4,14 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.amebame.triton.client.TritonMethodData;
-import com.amebame.triton.client.cassandra.entity.TritonCassandraBatchOperation;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 /**
  * BatchUpdate works as atomic batch.
  */
-@TritonMethodData("cassandra.columnfamily.batch")
+@TritonMethodData("cassandra.column.batch")
 @JsonInclude(Include.NON_NULL)
 public class BatchUpdate {
 
@@ -21,7 +20,7 @@ public class BatchUpdate {
 	
 	private Consistency consistency;
 	
-	private List<TritonCassandraBatchOperation> operations;
+	private List<BatchOperation> operations;
 	
 	public BatchUpdate() {
 	}
@@ -54,15 +53,29 @@ public class BatchUpdate {
 		return operations != null && operations.size() > 0;
 	}
 
-	public List<TritonCassandraBatchOperation> getOperations() {
+	public List<BatchOperation> getOperations() {
 		return operations;
 	}
 	
-	public void setOperations(List<TritonCassandraBatchOperation> operations) {
+	public void setOperations(List<BatchOperation> operations) {
 		this.operations = operations;
 	}
 	
-	public void addOperation(TritonCassandraBatchOperation operation) {
+	public BatchOperation addRemove() {
+		BatchOperation op = new BatchOperation();
+		op.setMode(BatchOperationMode.remove);
+		addOperation(op);
+		return op;
+	}
+
+	public BatchOperation addSet() {
+		BatchOperation op = new BatchOperation();
+		op.setMode(BatchOperationMode.set);
+		addOperation(op);
+		return op;
+	}
+	
+	public void addOperation(BatchOperation operation) {
 		if (operations == null) {
 			operations = new ArrayList<>();
 		}

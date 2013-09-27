@@ -1,18 +1,16 @@
 package com.amebame.triton.client.cassandra.method;
 
-import java.util.Map;
-
 import com.amebame.triton.client.TritonMethodData;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 
 @JsonInclude(Include.NON_NULL)
 @TritonMethodData("cassandra.column.set")
 public class SetColumns {
 	
-	private Map<String, Map<String, JsonNode>> rows;
+	// Map<String, Map<String, JsonNode>>
+	private JsonNode rows;
 	
 	private String cluster;
 	
@@ -20,20 +18,19 @@ public class SetColumns {
 	
 	private Integer ttl;
 	
-	@JsonProperty("column_family")
-	private String columnFamily;
+	private String table;
 	
 	private Consistency consistency;
 	
 	public SetColumns() {
 	}
 	
-	public void setRows(Map<String, Map<String, JsonNode>> rows) {
-		this.rows = rows;
+	public JsonNode getRows() {
+		return rows;
 	}
 	
-	public Map<String, Map<String, JsonNode>> getRows() {
-		return rows;
+	public void setRows(JsonNode rows) {
+		this.rows = rows;
 	}
 	
 	public void setConsistency(Consistency consistency) {
@@ -59,13 +56,13 @@ public class SetColumns {
 	public void setKeyspace(String keyspace) {
 		this.keyspace = keyspace;
 	}
-
-	public String getColumnFamily() {
-		return columnFamily;
+	
+	public String getTable() {
+		return table;
 	}
-
-	public void setColumnFamily(String columnFamily) {
-		this.columnFamily = columnFamily;
+	
+	public void setTable(String table) {
+		this.table = table;
 	}
 
 	public Integer getTtl() {

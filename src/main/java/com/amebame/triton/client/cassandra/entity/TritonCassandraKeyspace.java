@@ -1,6 +1,5 @@
 package com.amebame.triton.client.cassandra.entity;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -13,15 +12,10 @@ public class TritonCassandraKeyspace {
 	
 	private String name;
 	
-	@JsonProperty("strategy_class")
-	private String strategyClass;
+	private Map<String, String> replication;
 	
-	@JsonProperty("strategy_options")
-	private Map<String, String> strategyOptions;
+	private List<TritonCassandraTable> tables;
 	
-	@JsonProperty("column_families")
-	private List<TritonCassandraColumnFamily> columnFamilies;
-
 	public TritonCassandraKeyspace() {
 	}
 
@@ -33,35 +27,20 @@ public class TritonCassandraKeyspace {
 		this.name = name;
 	}
 	
-	public String getStrategyClass() {
-		return strategyClass;
+	public Map<String, String> getReplication() {
+		return replication;
 	}
 	
-	public void setStrategyClass(String strategyClass) {
-		this.strategyClass = strategyClass;
+	public void setReplication(Map<String, String> replication) {
+		this.replication = replication;
 	}
 	
-	public Map<String, String> getStrategyOptions() {
-		return strategyOptions;
+	public void setTables(List<TritonCassandraTable> tables) {
+		this.tables = tables;
 	}
 	
-	public void setStrategyOptions(Map<String, String> strategyOptions) {
-		this.strategyOptions = strategyOptions;
+	public List<TritonCassandraTable> getTables() {
+		return tables;
 	}
 	
-	public List<TritonCassandraColumnFamily> getColumnFamilies() {
-		return columnFamilies;
-	}
-	
-	public void setColumnFamilies(
-			List<TritonCassandraColumnFamily> columnFamilies) {
-		this.columnFamilies = columnFamilies;
-	}
-	
-	public void addColumnFamily(TritonCassandraColumnFamily columnFamily) {
-		if (columnFamilies == null) {
-			columnFamilies = new ArrayList<TritonCassandraColumnFamily>();
-		}
-		columnFamilies.add(columnFamily);
-	}
 }

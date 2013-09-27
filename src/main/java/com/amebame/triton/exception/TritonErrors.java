@@ -33,6 +33,8 @@ public enum TritonErrors {
 	cassandra_invalid_consistency(680),
 	cassandra_invalid_comparator(681),
 	cassandra_invalid_token_type(682),
+	cassandra_invalid_datatype(683),
+	cassandra_unsupported_datatype(690),
 	
 	// memcached errros
 	memcached_not_cofigured(700),

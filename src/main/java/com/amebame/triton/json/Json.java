@@ -12,11 +12,13 @@ import java.util.List;
 import java.util.UUID;
 
 import com.amebame.triton.exception.TritonJsonException;
+import com.fasterxml.jackson.core.JsonParser.Feature;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.deser.std.ClassDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.BooleanNode;
@@ -24,6 +26,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.NumericNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
+import com.fasterxml.jackson.databind.ser.std.StdJdkSerializers.ClassSerializer;
 
 public class Json {
 	
@@ -40,11 +43,16 @@ public class Json {
 		mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 		// ignore unknown properties
 		mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+		// accept comments in JSON
+		mapper.configure(Feature.ALLOW_COMMENTS, true);
 		// set serializer/deserializer
-		SimpleModule module = new SimpleModule("triton-json");
+		SimpleModule module = new SimpleModule("triton-json")
 		// UUID serializer/deserializer
-		module.addSerializer(UUID.class, new UUIDSerializer());
-		module.addDeserializer(UUID.class, new UUIDDeserializer());
+		.addSerializer(new UUIDSerializer())
+		.addDeserializer(UUID.class, new UUIDDeserializer())
+		.addSerializer(new ClassSerializer())
+		.addDeserializer(Class.class, new ClassDeserializer())
+		;
 		mapper.registerModule(module);
 		return mapper;
 	}
@@ -72,6 +80,14 @@ public class Json {
 	 */
 	public static final JsonNode tree(Object target) {
 		return MAPPER.valueToTree(target);
+	}
+	
+	public static final JsonNode tree(String source) {
+		try {
+			return MAPPER.readTree(source);
+		} catch (IOException e) {
+			throw new TritonJsonException(e.getMessage(), e);
+		}
 	}
 	
 	public static final JsonNode tree(byte[] bytes) {

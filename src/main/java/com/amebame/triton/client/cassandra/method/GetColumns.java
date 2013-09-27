@@ -1,11 +1,9 @@
 package com.amebame.triton.client.cassandra.method;
 
 import com.amebame.triton.client.TritonMethodData;
-import com.amebame.triton.json.Json;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 
 @TritonMethodData("cassandra.column.get")
@@ -16,8 +14,7 @@ public class GetColumns {
 	
 	private String keyspace;
 	
-	@JsonProperty("column_family")
-	private String columnFamily;
+	private String table;
 	
 	private Consistency consitency;
 	
@@ -27,7 +24,7 @@ public class GetColumns {
 	 * ["a","b","c"] = key array
 	 * { "start": "starttoken", "end": "endtoken" }
 	 * { "start": {"value":"starttoken","exclusive": true }, "end": "endtoken" } = column range with start exclusive
-	 * { "start": "starttoken", "limit": 100, "reversed": true, "end": "endtoken" }
+	 * { "start": "starttoken", "reversed": true, "end": "endtoken" }
 	 * 
 	 * note that the key is sorted by what partitioner you use.
 	 * if start is specified, end must be also specified.
@@ -41,7 +38,7 @@ public class GetColumns {
 	 * { "start": "fromkey", "end": "tokey" } = column range
 	 * { "startWith": "prefix" } = column start with prefix. if start or end is specified, startWith will be ignored.
 	 * { "start": {"value": "fromkey", "exclusive": true}, "end": "tokey" } = column range with start exclusive
-	 * { "end": "endcolumn", "limit": 100, "reversed": true } = column range with limit and reversed order.
+	 * { "end": "endcolumn", "reversed": true } = column range with limit and reversed order.
 	 */
 	private JsonNode columns;
 	
@@ -63,15 +60,15 @@ public class GetColumns {
 	public void setKeyspace(String keyspace) {
 		this.keyspace = keyspace;
 	}
-
-	public String getColumnFamily() {
-		return columnFamily;
-	}
-
-	public void setColumnFamily(String columnFamily) {
-		this.columnFamily = columnFamily;
+	
+	public String getTable() {
+		return table;
 	}
 	
+	public void setTable(String table) {
+		this.table = table;
+	}
+
 	@JsonIgnore
 	public boolean isSingleKey() {
 		return keys != null && !keys.isArray() && !keys.isObject();
@@ -118,7 +115,7 @@ public class GetColumns {
 	}
 	
 	public void setColumn(JsonNode column) {
-		this.columns = Json.array().add(column);
+		this.columns = column;
 	}
 	
 	public void setColumns(JsonNode columns) {
@@ -128,7 +125,7 @@ public class GetColumns {
 	public JsonNode getColumns() {
 		return columns;
 	}
-
+	
 	public Consistency getConsitency() {
 		return consitency;
 	}

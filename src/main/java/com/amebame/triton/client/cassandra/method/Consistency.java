@@ -10,5 +10,6 @@ public enum Consistency {
 	one,
 	two,
 	three
+	;
 	
 }
